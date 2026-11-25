@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#060714">
+  <meta name="description" content="Arcade landing gallery for the 6 playable games built during the Europaskolan Hackathon on 21 Nov 2026.">
+  <title>Europaskolan Arcade · 21 Nov 2026 Hackathon Gallery</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23080a1f'/%3E%3Crect x='6' y='6' width='52' height='52' rx='10' fill='none' stroke='%2300f5d4' stroke-width='4'/%3E%3Ccircle cx='32' cy='26' r='11' fill='%23ff2e63'/%3E%3Crect x='29' y='35' width='6' height='12' fill='%23e2e8f0'/%3E%3Crect x='18' y='45' width='28' height='7' rx='3' fill='%23ffd23f'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="arcade-shell">
+    <!-- Slim Neon Arcade Marquee Header -->
+    <header class="arcade-header" role="banner">
+      <div class="brand-lockup">
+        <svg class="brand-joystick" viewBox="0 0 36 36" aria-hidden="true">
+          <rect x="2" y="2" width="32" height="32" rx="7" fill="#101536" stroke="#00f5d4" stroke-width="2.2"/>
+          <circle cx="18" cy="13.5" r="6" fill="#ff2e63" stroke="#fff8d6" stroke-width="1.4"/>
+          <circle cx="16" cy="11.5" r="1.8" fill="#ffffff" opacity="0.8"/>
+          <rect x="16.2" y="19" width="3.6" height="7" fill="#cbd5e1"/>
+          <rect x="9.5" y="25" width="17" height="4.5" rx="2" fill="#ffd23f"/>
+        </svg>
+        <div class="brand-text">
+          <h1 class="brand-title">EUROPASKOLAN ARCADE</h1>
+          <span class="brand-date">21 NOV 2026</span>
+        </div>
+      </div>
+
+      <p class="marquee-hint" id="marquee-hint" aria-live="polite">
+        <span class="hint-dot" aria-hidden="true"></span>
+        <span class="hint-desktop">HOVER FOR ARCADE SFX · CLICK ANY CABINET TO PLAY</span>
+        <span class="hint-touch">TAP ONCE TO PREVIEW &amp; HEAR SFX · TAP AGAIN TO PLAY</span>
+      </p>
+
+      <div class="header-controls">
+        <button type="button" id="sfx-toggle" class="sfx-btn is-locked" aria-pressed="false" aria-label="Enable arcade sound effects">
+          <span class="sfx-led" aria-hidden="true"></span>
+          <span class="sfx-icon" aria-hidden="true">⚡</span>
+          <span class="sfx-label">ENABLE SFX</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main 50% (2 x 25%) / 50% (4 x 12.5%) Arcade Cabinet Grid -->
+    <main class="gallery-grid" id="gallery-grid" aria-label="Europaskolan Hackathon Game Cabinets">
+      <!-- Populated dynamically from js/games.js + js/svg-scenes.js -->
+    </main>
+
+    <!-- Subtle CRT scanlines & vignette atmosphere overlay -->
+    <div class="crt-overlay" aria-hidden="true"></div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

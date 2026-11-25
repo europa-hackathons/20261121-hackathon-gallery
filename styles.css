@@ -1,0 +1,1178 @@
+/* ============================================================================
+ * EUROPASKOLAN ARCADE — Classic Neon CRT Arcade Gallery
+ *
+ * Viewport Real Estate Spec (Desktop / Landscape >= 900px x 540px):
+ *  - Header: slim marquee bar (clamp(48px, 6.2vh, 58px))
+ *  - Gallery Grid: flex: 1 (fills remaining 100% of 100dvh, zero scroll)
+ *      - 4 equal columns x 2 equal rows (50% height top, 50% height bottom)
+ *      - Games 1 & 2 (.tier-large): span 2 cols x 1 row = 25.0% each (50% total)
+ *      - Games 3–6 (.tier-standard): 1 col x 1 row = 12.5% each (50% total)
+ * ============================================================================ */
+
+:root {
+  --bg-cabinet: #060714;
+  --bg-header: rgba(10, 12, 32, 0.92);
+  --border-subtle: rgba(148, 163, 184, 0.22);
+  --text-primary: #f8fafc;
+  --text-muted: #cbd5e1;
+  --neon-cyan: #00f5d4;
+  --neon-pink: #ff2e63;
+  --neon-gold: #ffd23f;
+  --font-arcade: 'Press Start 2P', 'Courier New', ui-monospace, monospace;
+  --font-ui: 'Chakra Petch', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --grid-gap: 10px;
+  --grid-pad: 10px;
+  --radius-tile: 14px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  background: var(--bg-cabinet);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(0, 245, 212, 0.09), transparent 42%),
+    radial-gradient(circle at 82% 0%, rgba(255, 46, 99, 0.09), transparent 42%),
+    linear-gradient(180deg, #07091a 0%, #04050e 100%);
+}
+
+/* ============================================================================
+ * SHELL & SLIM ARCADE MARQUEE HEADER
+ * ============================================================================ */
+.arcade-shell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.arcade-header {
+  flex: 0 0 auto;
+  height: clamp(48px, 6.2vh, 58px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 14px;
+  background: var(--bg-header);
+  border-bottom: 2px solid rgba(0, 245, 212, 0.28);
+  box-shadow:
+    0 2px 18px rgba(0, 0, 0, 0.65),
+    inset 0 -1px 0 rgba(255, 46, 99, 0.25);
+  z-index: 10;
+}
+
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.brand-joystick {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  filter: drop-shadow(0 0 8px rgba(0, 245, 212, 0.45));
+}
+
+.brand-text {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.brand-title {
+  font-family: var(--font-arcade);
+  font-size: clamp(0.68rem, 1.15vw, 0.96rem);
+  letter-spacing: 0.06em;
+  color: #fff8d6;
+  text-shadow:
+    0 0 10px rgba(0, 245, 212, 0.65),
+    0 2px 0 #ff2e63;
+  white-space: nowrap;
+}
+
+.brand-date {
+  font-family: var(--font-arcade);
+  font-size: clamp(0.5rem, 0.72vw, 0.62rem);
+  color: var(--neon-cyan);
+  background: rgba(0, 245, 212, 0.11);
+  border: 1px solid rgba(0, 245, 212, 0.42);
+  border-radius: 4px;
+  padding: 4px 7px;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.marquee-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: clamp(0.72rem, 0.95vw, 0.86rem);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #cbd5e1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hint-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--neon-gold);
+  box-shadow: 0 0 8px var(--neon-gold);
+  animation: blink-led 1.4s ease-in-out infinite;
+  flex: 0 0 7px;
+}
+
+.hint-touch {
+  display: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .hint-desktop { display: none; }
+  .hint-touch { display: inline; }
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.sfx-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border-radius: 7px;
+  border: 1.5px solid rgba(0, 245, 212, 0.55);
+  background: rgba(15, 23, 56, 0.85);
+  color: #e2f9ff;
+  font-family: var(--font-arcade);
+  font-size: clamp(0.52rem, 0.7vw, 0.62rem);
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: transform 140ms ease, box-shadow 180ms ease, border-color 180ms ease, background 180ms ease;
+  white-space: nowrap;
+}
+
+.sfx-btn:hover,
+.sfx-btn:focus-visible {
+  transform: translateY(-1px);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 14px rgba(0, 245, 212, 0.5);
+  outline: none;
+}
+
+.sfx-led {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--neon-gold);
+  box-shadow: 0 0 8px var(--neon-gold);
+}
+
+.sfx-btn.is-locked {
+  border-color: rgba(255, 210, 63, 0.72);
+  color: #fff8d6;
+  box-shadow: 0 0 12px rgba(255, 210, 63, 0.25);
+}
+
+.sfx-btn.is-locked .sfx-led {
+  background: var(--neon-gold);
+  animation: blink-led 1.1s ease-in-out infinite;
+}
+
+.sfx-btn.is-attention {
+  animation: sfx-nudge 420ms ease;
+  border-color: #ffd23f;
+  box-shadow: 0 0 20px rgba(255, 210, 63, 0.75);
+}
+
+.sfx-btn.is-on {
+  border-color: rgba(0, 245, 212, 0.78);
+  background: rgba(0, 245, 212, 0.14);
+  color: #9ffef0;
+}
+
+.sfx-btn.is-on .sfx-led {
+  background: #00ff87;
+  box-shadow: 0 0 10px #00ff87;
+}
+
+.sfx-btn.is-muted {
+  border-color: rgba(148, 163, 184, 0.45);
+  background: rgba(30, 41, 59, 0.65);
+  color: #94a3b8;
+}
+
+.sfx-btn.is-muted .sfx-led {
+  background: #ff2e63;
+  box-shadow: 0 0 6px rgba(255, 46, 99, 0.65);
+}
+
+/* ============================================================================
+ * GALLERY GRID — STRICT 50% (2 x 25%) / 50% (4 x 12.5%) REAL ESTATE
+ * ============================================================================ */
+.gallery-grid {
+  flex: 1 1 0;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--grid-gap);
+  padding: var(--grid-pad);
+}
+
+.game-tile.tier-large {
+  grid-column: span 2;
+  grid-row: 1;
+}
+
+.game-tile.tier-standard {
+  grid-column: span 1;
+  grid-row: 2;
+}
+
+/* ============================================================================
+ * ARCADE CABINET TILE
+ * ============================================================================ */
+.game-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-width: 0;
+  min-height: 0;
+  border-radius: var(--radius-tile);
+  overflow: hidden;
+  background: linear-gradient(160deg, var(--bg-start), var(--bg-end));
+  border: 2px solid color-mix(in srgb, var(--accent) 52%, rgba(255, 255, 255, 0.12));
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.58),
+    inset 0 0 28px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+  isolation: isolate;
+  cursor: pointer;
+  transition:
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 220ms ease,
+    box-shadow 240ms ease;
+}
+
+/* Subtle CRT Glass Highlight + Neon Corner Brackets */
+.game-tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, transparent 28%),
+    radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 62%);
+  opacity: 0.72;
+  transition: opacity 220ms ease;
+}
+
+/* Hover / Active / Focus Overdrive Cabinet Glow */
+.game-tile:hover,
+.game-tile.is-active,
+.game-tile:focus-within {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 26px var(--accent-glow),
+    0 14px 36px rgba(0, 0, 0, 0.72),
+    inset 0 0 26px color-mix(in srgb, var(--accent) 22%, transparent);
+  z-index: 5;
+}
+
+.game-tile:hover::before,
+.game-tile.is-active::before,
+.game-tile:focus-within::before {
+  opacity: 1;
+}
+
+/* Corner Arcade Reticle Brackets (flare on hover/select) */
+.tile-corners {
+  position: absolute;
+  inset: 7px;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0.32;
+  transition: opacity 200ms ease, inset 200ms ease;
+}
+
+.game-tile:hover .tile-corners,
+.game-tile.is-active .tile-corners,
+.game-tile:focus-within .tile-corners {
+  opacity: 1;
+  inset: 5px;
+}
+
+.tile-corners::before,
+.tile-corners::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(var(--accent), var(--accent)) top left / 14px 2.5px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) top left / 2.5px 14px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) top right / 14px 2.5px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) top right / 2.5px 14px no-repeat;
+}
+
+.tile-corners::after {
+  background:
+    linear-gradient(var(--accent-2), var(--accent-2)) bottom left / 14px 2.5px no-repeat,
+    linear-gradient(var(--accent-2), var(--accent-2)) bottom left / 2.5px 14px no-repeat,
+    linear-gradient(var(--accent-2), var(--accent-2)) bottom right / 14px 2.5px no-repeat,
+    linear-gradient(var(--accent-2), var(--accent-2)) bottom right / 2.5px 14px no-repeat;
+}
+
+/* Full-Bleed Animated SVG Stage */
+.tile-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.arcade-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1), filter 260ms ease;
+}
+
+.game-tile:hover .arcade-svg,
+.game-tile.is-active .arcade-svg,
+.game-tile:focus-within .arcade-svg {
+  transform: scale(1.035);
+  filter: saturate(1.16) brightness(1.06);
+}
+
+.game-tile:has(.tile-primary-link:focus-visible) {
+  outline: 2px solid #fff8d6;
+  outline-offset: 2px;
+}
+
+/* ============================================================================
+ * BOTTOM CABINET HUD (Title, 1-line Tagline, Play CTA & Subtle GitHub Link)
+ * Note: .tile-hud intentionally omits `position: relative` so the stretched
+ * `.tile-primary-link::after` covers the entire `.game-tile`, while flex item
+ * `z-index: 3` keeps the HUD layered above `.tile-stage`.
+ * ============================================================================ */
+.tile-hud {
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 28px 14px 12px;
+  background: linear-gradient(
+    180deg,
+    rgba(6, 7, 20, 0) 0%,
+    rgba(6, 7, 20, 0.78) 38%,
+    rgba(6, 7, 20, 0.96) 100%
+  );
+  pointer-events: none;
+}
+
+.tier-large .tile-hud {
+  padding: 36px 20px 16px;
+  gap: 7px;
+}
+
+.tile-hud-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.tile-meta {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.tile-title {
+  margin: 0;
+  line-height: 1.25;
+}
+
+/* Primary Stretched Link covers whole tile for native accessibility & desktop click */
+.tile-primary-link {
+  color: #ffffff;
+  text-decoration: none;
+  font-family: var(--font-arcade);
+  font-size: clamp(0.66rem, 0.96vw, 0.92rem);
+  letter-spacing: 0.03em;
+  text-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.92),
+    0 0 12px var(--accent-glow);
+  pointer-events: auto;
+  display: inline-block;
+}
+
+.tier-large .tile-primary-link {
+  font-size: clamp(1rem, 1.65vw, 1.56rem);
+  letter-spacing: 0.04em;
+}
+
+.tile-primary-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.tile-primary-link:focus-visible {
+  outline: none;
+}
+
+.tile-tagline {
+  margin-top: 4px;
+  font-size: clamp(0.75rem, 0.92vw, 0.88rem);
+  font-weight: 600;
+  line-height: 1.25;
+  color: #d8e4f5;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tier-large .tile-tagline {
+  font-size: clamp(0.88rem, 1.12vw, 1.05rem);
+  -webkit-line-clamp: 1;
+}
+
+.tile-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 4;
+}
+
+/* PLAY CTA Pill — pops on hover (desktop) & stays prominently lit on 1st touch tap */
+.tile-play-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #060714;
+  font-family: var(--font-arcade);
+  font-size: clamp(0.5rem, 0.64vw, 0.62rem);
+  letter-spacing: 0.05em;
+  box-shadow: 0 0 14px var(--accent-glow);
+  opacity: 0;
+  transform: translateY(6px) scale(0.94);
+  transition: opacity 180ms ease, transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.tier-large .tile-play-pill {
+  padding: 8px 14px;
+  font-size: clamp(0.6rem, 0.8vw, 0.74rem);
+}
+
+.game-tile:hover .tile-play-pill,
+.game-tile.is-active .tile-play-pill,
+.game-tile:focus-within .tile-play-pill {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.game-tile.is-active .tile-play-pill {
+  animation: play-pulse 1.15s ease-in-out infinite;
+}
+
+/* Subtle GitHub Repo Icon Link */
+.tile-repo-link {
+  position: relative;
+  z-index: 5;
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  color: rgba(226, 232, 240, 0.72);
+  background: rgba(10, 14, 34, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  transition: color 160ms ease, border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.tier-large .tile-repo-link {
+  width: 34px;
+  height: 34px;
+}
+
+.tile-repo-link svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.tier-large .tile-repo-link svg {
+  width: 18px;
+  height: 18px;
+}
+
+.tile-repo-link:hover,
+.tile-repo-link:focus-visible {
+  color: #ffffff;
+  border-color: var(--accent);
+  background: rgba(15, 23, 54, 0.96);
+  box-shadow: 0 0 12px var(--accent-glow);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+/* ============================================================================
+ * CRT SCANLINE & VIGNETTE ATMOSPHERE OVERLAY
+ * ============================================================================ */
+.crt-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0px,
+      rgba(0, 0, 0, 0) 2px,
+      rgba(0, 0, 0, 0.13) 3px,
+      rgba(0, 0, 0, 0) 4px
+    ),
+    radial-gradient(ellipse at center, transparent 62%, rgba(0, 0, 0, 0.38) 100%);
+}
+
+/* ============================================================================
+ * SHARED & PER-GAME ARCADE SVG KEYFRAME ANIMATIONS
+ * All animations speed up & intensify on :hover / .is-active / :focus-within!
+ * ============================================================================ */
+.arcade-svg [class*="-anim"],
+.arcade-svg .rp-flame-flicker,
+.arcade-svg .sr-thrusters,
+.arcade-svg .sr-target-ring,
+.arcade-svg .ps-timing-ring,
+.arcade-svg .fs-catch-star,
+.arcade-svg .sw-pulse-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Shared Twinkles */
+.twinkle-a { animation: twinkle 1.8s ease-in-out infinite; }
+.twinkle-b { animation: twinkle 2.3s ease-in-out 0.6s infinite; }
+.twinkle-c { animation: twinkle 1.5s ease-in-out 1.1s infinite; }
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.28; }
+  50% { opacity: 1; }
+}
+
+@keyframes blink-led {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.82); }
+}
+
+@keyframes sfx-nudge {
+  0%, 100% { transform: scale(1); }
+  30% { transform: scale(1.08); }
+  65% { transform: scale(0.97); }
+}
+
+@keyframes play-pulse {
+  0%, 100% { box-shadow: 0 0 12px var(--accent-glow); }
+  50% { box-shadow: 0 0 24px var(--accent), 0 0 6px #ffffff; }
+}
+
+/* --- 1. ROCKET PUNCH! --- */
+.rp-spotlight-l {
+  transform-origin: 110px 0px;
+  animation: rp-beam-l 4.4s ease-in-out infinite;
+}
+.rp-spotlight-r {
+  transform-origin: 530px 0px;
+  animation: rp-beam-r 4.4s ease-in-out infinite;
+}
+.rp-super-pulse {
+  animation: twinkle 1.1s ease-in-out infinite;
+}
+.rp-boxer-left-anim {
+  animation: rp-bob-l 0.85s ease-in-out infinite;
+}
+.rp-cuff-spark {
+  animation: rp-cuff 2.3s ease-out infinite;
+}
+.rp-boxer-right-anim {
+  animation: rp-recoil 2.3s ease-in-out infinite;
+}
+.rp-rocket-flight {
+  animation: rp-launch 2.3s cubic-bezier(0.32, 0.04, 0.22, 1) infinite;
+}
+.rp-flame-flicker {
+  transform-origin: right center;
+  animation: rp-flame 0.16s ease-in-out infinite alternate;
+}
+.rp-impact-burst-anim {
+  animation: rp-impact 2.3s ease-out infinite;
+}
+.rp-lightning {
+  animation: rp-bolt 2.3s linear infinite;
+}
+
+/* Overdrive on Rocket Punch */
+.game-tile:hover .rp-rocket-flight,
+.game-tile.is-active .rp-rocket-flight,
+.game-tile:focus-within .rp-rocket-flight { animation-duration: 1.3s; }
+.game-tile:hover .rp-impact-burst-anim,
+.game-tile.is-active .rp-impact-burst-anim,
+.game-tile:focus-within .rp-impact-burst-anim { animation-duration: 1.3s; }
+.game-tile:hover .rp-boxer-right-anim,
+.game-tile.is-active .rp-boxer-right-anim,
+.game-tile:focus-within .rp-boxer-right-anim { animation-duration: 1.3s; }
+.game-tile:hover .rp-lightning,
+.game-tile.is-active .rp-lightning,
+.game-tile:focus-within .rp-lightning { animation-duration: 1.3s; }
+
+@keyframes rp-beam-l {
+  0%, 100% { transform: rotate(-7deg); }
+  50% { transform: rotate(9deg); }
+}
+@keyframes rp-beam-r {
+  0%, 100% { transform: rotate(7deg); }
+  50% { transform: rotate(-9deg); }
+}
+@keyframes rp-bob-l {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes rp-cuff {
+  0%, 15% { opacity: 1; }
+  30%, 100% { opacity: 0.15; }
+}
+@keyframes rp-launch {
+  0% { transform: translateX(-48px) scale(0.95); }
+  12% { transform: translateX(-56px) scale(0.96); }
+  46% { transform: translateX(148px) scale(1.06); }
+  56% { transform: translateX(140px) scale(1.02); }
+  88% { transform: translateX(-48px) scale(0.95); }
+  100% { transform: translateX(-48px) scale(0.95); }
+}
+@keyframes rp-flame {
+  0% { transform: scaleX(0.84) scaleY(0.92); }
+  100% { transform: scaleX(1.18) scaleY(1.08); }
+}
+@keyframes rp-impact {
+  0%, 42% { opacity: 0; transform: scale(0.15) rotate(-12deg); }
+  48% { opacity: 1; transform: scale(1.22) rotate(12deg); }
+  62% { opacity: 0.9; transform: scale(1.02) rotate(22deg); }
+  76%, 100% { opacity: 0; transform: scale(0.35) rotate(35deg); }
+}
+@keyframes rp-recoil {
+  0%, 42% { transform: translate(0, 0) rotate(0deg); }
+  48% { transform: translate(16px, -6px) rotate(7deg); }
+  62% { transform: translate(10px, -2px) rotate(4deg); }
+  82%, 100% { transform: translate(0, 0) rotate(0deg); }
+}
+@keyframes rp-bolt {
+  0%, 44%, 56%, 100% { opacity: 0; }
+  47%, 52% { opacity: 0.92; }
+}
+
+/* --- 2. SPACE RUN --- */
+.sr-warp-lines {
+  transform-origin: 320px 155px;
+  animation: sr-warp 1.9s ease-in-out infinite;
+}
+.sr-asteroid-1-anim {
+  animation: sr-tumble-l 7.5s linear infinite;
+}
+.sr-asteroid-2-anim {
+  animation: sr-tumble-r 6.4s linear infinite;
+}
+.sr-alien-fleet {
+  animation: sr-sway 3.6s ease-in-out infinite;
+}
+.sr-target-ring {
+  animation: spin-cw 6s linear infinite;
+}
+.sr-alien-wing-l-anim {
+  animation: float-y 1.8s ease-in-out infinite;
+}
+.sr-alien-wing-r-anim {
+  animation: float-y 1.8s ease-in-out 0.9s infinite;
+}
+.sr-hit-burst-anim {
+  animation: sr-hit 1.1s ease-out infinite;
+}
+.sr-bolt-1 {
+  animation: sr-fire 0.95s linear infinite;
+}
+.sr-bolt-2 {
+  animation: sr-fire 0.95s linear 0.22s infinite;
+}
+.sr-bolt-3 {
+  animation: sr-fire 1.1s linear 0.55s infinite;
+}
+.sr-ship-anim {
+  animation: sr-bank 3.8s ease-in-out infinite;
+}
+.sr-thrusters {
+  transform-origin: center top;
+  animation: sr-flame 0.14s ease-in-out infinite alternate;
+}
+
+.game-tile:hover .sr-bolt-1,
+.game-tile.is-active .sr-bolt-1,
+.game-tile:focus-within .sr-bolt-1 { animation-duration: 0.52s; }
+.game-tile:hover .sr-bolt-2,
+.game-tile.is-active .sr-bolt-2,
+.game-tile:focus-within .sr-bolt-2 { animation-duration: 0.52s; }
+.game-tile:hover .sr-ship-anim,
+.game-tile.is-active .sr-ship-anim,
+.game-tile:focus-within .sr-ship-anim { animation-duration: 2.1s; }
+
+@keyframes sr-warp {
+  0% { opacity: 0.25; transform: scale(0.92); }
+  50% { opacity: 0.85; transform: scale(1.08); }
+  100% { opacity: 0.25; transform: scale(0.92); }
+}
+@keyframes sr-tumble-l {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-10px, 14px) rotate(180deg); }
+  100% { transform: translate(0, 0) rotate(360deg); }
+}
+@keyframes sr-tumble-r {
+  0% { transform: translate(0, 0) rotate(360deg); }
+  50% { transform: translate(12px, 12px) rotate(180deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+@keyframes sr-sway {
+  0%, 100% { transform: translateX(-34px); }
+  50% { transform: translateX(34px); }
+}
+@keyframes sr-fire {
+  0% { transform: translateY(68px); opacity: 0; }
+  18% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateY(-76px); opacity: 0; }
+}
+@keyframes sr-hit {
+  0%, 62% { opacity: 0; transform: scale(0.2); }
+  74% { opacity: 1; transform: scale(1.25) rotate(24deg); }
+  100% { opacity: 0; transform: scale(0.5) rotate(45deg); }
+}
+@keyframes sr-bank {
+  0%, 100% { transform: translateX(-48px) rotate(-9deg); }
+  50% { transform: translateX(48px) rotate(9deg); }
+}
+@keyframes sr-flame {
+  0% { transform: scaleY(0.78); }
+  100% { transform: scaleY(1.28); }
+}
+
+/* --- 3. PENALTY SHOOTOUT --- */
+.ps-floodlights {
+  animation: twinkle 3.2s ease-in-out infinite;
+}
+.ps-timing-ring {
+  animation: ps-ring 2.4s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+}
+.ps-keeper-anim {
+  animation: ps-dive 2.4s ease-in-out infinite;
+}
+.ps-shot-arc {
+  animation: ps-dash 1.2s linear infinite;
+}
+.ps-ball {
+  animation: ps-kick 2.4s cubic-bezier(0.2, 0.72, 0.3, 1) infinite;
+}
+.ps-goal-burst-anim {
+  animation: ps-goal 2.4s ease-out infinite;
+}
+
+.game-tile:hover .ps-ball,
+.game-tile.is-active .ps-ball,
+.game-tile:focus-within .ps-ball,
+.game-tile:hover .ps-timing-ring,
+.game-tile.is-active .ps-timing-ring,
+.game-tile:focus-within .ps-timing-ring,
+.game-tile:hover .ps-keeper-anim,
+.game-tile.is-active .ps-keeper-anim,
+.game-tile:focus-within .ps-keeper-anim,
+.game-tile:hover .ps-goal-burst-anim,
+.game-tile.is-active .ps-goal-burst-anim,
+.game-tile:focus-within .ps-goal-burst-anim { animation-duration: 1.5s; }
+
+@keyframes ps-ring {
+  0% { transform: scale(1.75); opacity: 0.25; }
+  38% { transform: scale(0.56); opacity: 1; stroke: #00ff87; }
+  52% { transform: scale(0.52); opacity: 0.9; stroke: #ffd166; }
+  66%, 100% { transform: scale(1.75); opacity: 0; }
+}
+@keyframes ps-kick {
+  0%, 36% { transform: translate(180px, 236px) scale(1.12) rotate(0deg); opacity: 1; }
+  52% { transform: translate(134px, 162px) scale(0.84) rotate(-175deg); opacity: 1; }
+  66% { transform: translate(108px, 102px) scale(0.62) rotate(-350deg); opacity: 1; }
+  82% { transform: translate(112px, 118px) scale(0.6) rotate(-380deg); opacity: 0.9; }
+  92% { transform: translate(112px, 126px) scale(0.58); opacity: 0; }
+  100% { transform: translate(180px, 236px) scale(1.12); opacity: 0; }
+}
+@keyframes ps-dive {
+  0%, 34% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(26px, 8px) rotate(24deg); }
+  74% { transform: translate(30px, 14px) rotate(28deg); }
+  94%, 100% { transform: translate(0, 0) rotate(0deg); }
+}
+@keyframes ps-goal {
+  0%, 62% { opacity: 0; transform: scale(0.2); }
+  70% { opacity: 1; transform: scale(1.25) rotate(18deg); }
+  86%, 100% { opacity: 0; transform: scale(0.4) rotate(36deg); }
+}
+@keyframes ps-dash {
+  from { stroke-dashoffset: 26; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* --- 4. BDOU - DISCO SUSHI TRAIN --- */
+.bd-beams {
+  transform-origin: 180px 62px;
+  animation: bd-sweep 3.2s ease-in-out infinite;
+}
+.bd-disco-ball-anim {
+  animation: bd-ball-sway 2.6s ease-in-out infinite;
+}
+.bd-belt-track {
+  animation: bd-conveyor 1.1s linear infinite;
+}
+.bd-sushi-1-anim {
+  animation: bd-bounce 0.9s ease-in-out infinite;
+}
+.bd-sushi-2-anim {
+  animation: bd-bounce 0.9s ease-in-out 0.3s infinite;
+}
+.bd-sushi-3-anim {
+  animation: bd-bounce 0.9s ease-in-out 0.6s infinite;
+}
+.bd-note-1 {
+  animation: bd-note 2s ease-in-out infinite;
+}
+.bd-note-2 {
+  animation: bd-note 2.2s ease-in-out 0.8s infinite;
+}
+
+.game-tile:hover .bd-belt-track,
+.game-tile.is-active .bd-belt-track,
+.game-tile:focus-within .bd-belt-track { animation-duration: 0.55s; }
+.game-tile:hover .bd-beams,
+.game-tile.is-active .bd-beams,
+.game-tile:focus-within .bd-beams { animation-duration: 1.4s; }
+.game-tile:hover .bd-sushi-1-anim,
+.game-tile.is-active .bd-sushi-1-anim,
+.game-tile:hover .bd-sushi-2-anim,
+.game-tile.is-active .bd-sushi-2-anim,
+.game-tile:hover .bd-sushi-3-anim,
+.game-tile.is-active .bd-sushi-3-anim { animation-duration: 0.55s; }
+
+@keyframes bd-sweep {
+  0%, 100% { transform: rotate(-13deg); }
+  50% { transform: rotate(13deg); }
+}
+@keyframes bd-ball-sway {
+  0%, 100% { transform: rotate(-5deg) scale(1); }
+  50% { transform: rotate(5deg) scale(1.04); }
+}
+@keyframes bd-conveyor {
+  from { transform: translateX(0); }
+  to { transform: translateX(40px); }
+}
+@keyframes bd-bounce {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-13px) rotate(4deg); }
+}
+@keyframes bd-note {
+  0% { transform: translate(0, 10px) scale(0.85); opacity: 0; }
+  35% { opacity: 1; }
+  100% { transform: translate(8px, -26px) scale(1.12); opacity: 0; }
+}
+
+/* --- 5. FRUITY SNOWLAND --- */
+.fs-snow-layer {
+  animation: fs-snowfall 4.2s linear infinite;
+}
+.fs-fruit-1-anim {
+  animation: fs-drop 2.8s ease-in infinite;
+}
+.fs-fruit-2-anim {
+  animation: fs-drop 3.1s ease-in 0.95s infinite;
+}
+.fs-fruit-3-anim {
+  animation: fs-drop 2.6s ease-in 1.75s infinite;
+}
+.fs-snowball-anim {
+  animation: fs-snowball-drop 2.9s ease-in 0.45s infinite;
+}
+.fs-buddy-anim {
+  animation: fs-glide 3.4s ease-in-out infinite;
+}
+.fs-catch-star {
+  animation: spin-cw 3s linear infinite, twinkle 1.2s ease-in-out infinite;
+}
+
+.game-tile:hover .fs-fruit-1-anim,
+.game-tile.is-active .fs-fruit-1-anim { animation-duration: 1.65s; }
+.game-tile:hover .fs-fruit-2-anim,
+.game-tile.is-active .fs-fruit-2-anim { animation-duration: 1.85s; }
+.game-tile:hover .fs-buddy-anim,
+.game-tile.is-active .fs-buddy-anim { animation-duration: 1.9s; }
+
+@keyframes fs-snowfall {
+  0% { transform: translate(-8px, -22px); opacity: 0.25; }
+  20% { opacity: 0.9; }
+  85% { opacity: 0.85; }
+  100% { transform: translate(16px, 95px); opacity: 0; }
+}
+@keyframes fs-drop {
+  0% { transform: translateY(-48px) rotate(-14deg); opacity: 0; }
+  14% { opacity: 1; }
+  84% { opacity: 1; }
+  100% { transform: translateY(112px) rotate(22deg); opacity: 0; }
+}
+@keyframes fs-snowball-drop {
+  0% { transform: translate(0, -40px) rotate(0deg); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translate(-10px, 124px) rotate(-240deg); opacity: 0; }
+}
+@keyframes fs-glide {
+  0%, 100% { transform: translateX(-54px) translateY(0); }
+  25% { transform: translateX(-4px) translateY(-9px); }
+  50% { transform: translateX(46px) translateY(0); }
+  75% { transform: translateX(-4px) translateY(-7px); }
+}
+
+/* --- 6. SAVE THE WOODS --- */
+.sw-pulse-ring {
+  animation: sw-shield-wave 2.4s ease-out infinite;
+}
+.sw-wolf-anim {
+  animation: sw-leap 2.4s cubic-bezier(0.28, 0.08, 0.24, 1) infinite;
+}
+.sw-chopper-bot-anim {
+  animation: sw-bot-hover 2.4s ease-in-out infinite;
+}
+.sw-saw-anim {
+  animation: spin-cw 0.75s linear infinite;
+}
+.sw-led-blink {
+  animation: twinkle 0.65s steps(2, start) infinite;
+}
+
+.game-tile:hover .sw-saw-anim,
+.game-tile.is-active .sw-saw-anim { animation-duration: 0.32s; }
+.game-tile:hover .sw-wolf-anim,
+.game-tile.is-active .sw-wolf-anim,
+.game-tile:hover .sw-chopper-bot-anim,
+.game-tile.is-active .sw-chopper-bot-anim,
+.game-tile:hover .sw-pulse-ring,
+.game-tile.is-active .sw-pulse-ring { animation-duration: 1.4s; }
+
+@keyframes sw-leap {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  36% { transform: translate(38px, -28px) rotate(-10deg); }
+  56% { transform: translate(48px, -10px) rotate(4deg); }
+  78% { transform: translate(12px, 0) rotate(0deg); }
+}
+@keyframes sw-bot-hover {
+  0%, 38% { transform: translate(0, -4px); }
+  52% { transform: translate(12px, -10px) rotate(7deg); }
+  70% { transform: translate(4px, 3px) rotate(-2deg); }
+  100% { transform: translate(0, -4px); }
+}
+@keyframes sw-shield-wave {
+  0%, 32% { transform: scale(0.45); opacity: 0; }
+  48% { transform: scale(1.1); opacity: 0.85; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+/* Shared Utility Keyframes */
+@keyframes spin-cw {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes float-y {
+  0%, 100% { transform: translateY(-5px); }
+  50% { transform: translateY(6px); }
+}
+
+/* ============================================================================
+ * RESPONSIVE BREAKPOINTS (Tablet & Mobile)
+ * Preserves the 2-large / 4-standard visual hierarchy gracefully on small screens
+ * ============================================================================ */
+@media (max-width: 1120px) {
+  .marquee-hint {
+    display: none;
+  }
+}
+
+/* Tablet Portrait / Narrow Desktop: preserve exact 2:1 tile area ratio */
+@media (max-width: 899px), (max-height: 539px) {
+  .arcade-shell {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .arcade-header {
+    position: sticky;
+    top: 0;
+  }
+
+  .gallery-grid {
+    flex: none;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: none;
+    grid-auto-rows: auto;
+  }
+
+  .game-tile.tier-large {
+    grid-column: span 1;
+    grid-row: auto;
+    min-height: clamp(270px, 42vh, 360px);
+  }
+
+  .game-tile.tier-standard {
+    grid-column: span 1;
+    grid-row: auto;
+    min-height: clamp(195px, 24vh, 250px);
+  }
+
+  .tier-large .tile-primary-link {
+    font-size: clamp(0.88rem, 2.3vw, 1.24rem);
+  }
+
+  .tile-primary-link {
+    font-size: clamp(0.68rem, 1.7vw, 0.9rem);
+  }
+}
+
+/* Mobile Portrait: 2 featured full-width cards on top, 2x2 grid below */
+@media (max-width: 599px) {
+  :root {
+    --grid-gap: 9px;
+    --grid-pad: 9px;
+  }
+
+  .arcade-header {
+    padding: 8px 10px;
+    height: auto;
+    min-height: 50px;
+  }
+
+  .brand-date {
+    display: none;
+  }
+
+  .brand-title {
+    font-size: 0.66rem;
+  }
+
+  .sfx-btn {
+    padding: 6px 9px;
+    font-size: 0.5rem;
+  }
+
+  .game-tile.tier-large {
+    grid-column: 1 / -1;
+    min-height: 235px;
+  }
+
+  .game-tile.tier-standard {
+    grid-column: span 1;
+    min-height: 205px;
+  }
+
+  .tile-hud {
+    padding: 22px 10px 10px;
+  }
+
+  .tier-large .tile-hud {
+    padding: 28px 14px 12px;
+  }
+
+  .tile-primary-link {
+    font-size: 0.64rem;
+  }
+
+  .tier-large .tile-primary-link {
+    font-size: 0.95rem;
+  }
+
+  .tile-tagline {
+    font-size: 0.72rem;
+  }
+
+  .tile-repo-link {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* Very narrow phones (< 375px): clean single column with taller featured tiles */
+@media (max-width: 374px) {
+  .gallery-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .game-tile.tier-standard {
+    min-height: 180px;
+  }
+}
+
+/* ============================================================================
+ * REDUCED MOTION ACCESSIBILITY
+ * ============================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .arcade-svg *,
+  .hint-dot,
+  .sfx-led,
+  .tile-play-pill {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
